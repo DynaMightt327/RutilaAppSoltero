@@ -26,6 +26,7 @@ public class VentanaRegistroPersona extends JFrame{
 	private JLabel label7;
 	private JLabel label8;
 	private JLabel fotoPreview;
+	private JLabel lIniSesion;
 	
 	private JTextField nombre;
 	private JTextField apellido;
@@ -36,6 +37,7 @@ public class VentanaRegistroPersona extends JFrame{
 	private JComboBox<String> genero;
 	private JButton subirFoto;
 	private JButton guardarPersona;
+	private JButton iniciarSesion;
 	
 	private String rutaImagenSeleccionada;
 	private JComboBox<String> changeLanguage;
@@ -73,6 +75,12 @@ public class VentanaRegistroPersona extends JFrame{
 		info.setFont(new Font("Arial", Font.BOLD, 18));
 		info.setForeground(Color.white);
 		add(info);
+
+		lIniSesion = new JLabel("¿Ya creaste tu cuenta? ");
+		lIniSesion.setBounds(165, 654, 150, 20);
+		lIniSesion.setFont(new Font("Arial", Font.BOLD, 12));
+		lIniSesion.setForeground(Color.white);
+		add(lIniSesion);
 		
 		label1 = new JLabel("Nombre(s):");
 		label1.setBounds(100, 240, 200, 18);
@@ -161,7 +169,7 @@ public class VentanaRegistroPersona extends JFrame{
 		add(subirFoto);
 		
 		guardarPersona = new JButton("GUARDAR");
-		guardarPersona.setBounds(330, 600, 90, 45);
+		guardarPersona.setBounds(330, 590, 90, 45);
 		guardarPersona.setBackground(Color.decode("#ab1a1c"));
 		guardarPersona.setForeground(Color.white);
 		guardarPersona.setFocusPainted(false);
@@ -182,12 +190,20 @@ public class VentanaRegistroPersona extends JFrame{
 		add(changeLanguage);
 		
 		volver = new JButton("VOLVER");
-		volver.setBounds(220, 600, 95, 45);
+		volver.setBounds(207, 590, 95, 45);
 		volver.setBackground(Color.decode("#ab1a1c"));
 		volver.setForeground(Color.white);
 		volver.setBorderPainted(false);
 		volver.setFocusPainted(false);
 		add(volver);
+
+		iniciarSesion = new JButton("Inicia sesión aquí");
+		iniciarSesion.setBounds(305, 650, 150, 25);
+		iniciarSesion.setBackground(Color.white);
+		iniciarSesion.setForeground(Color.decode("#270205"));
+		iniciarSesion.setBorderPainted(false);
+		iniciarSesion.setFocusPainted(false);
+		add(iniciarSesion);
 	}
 
 	public JTextArea getTitulo() {
@@ -372,6 +388,22 @@ public class VentanaRegistroPersona extends JFrame{
 
 	public void setRutaImagenSeleccionada(String rutaImagenSeleccionada) {
 		this.rutaImagenSeleccionada = rutaImagenSeleccionada;
+	}
+
+	public JLabel getlIniSesion() {
+		return lIniSesion;
+	}
+
+	public void setlIniSesion(JLabel lIniSesion) {
+		this.lIniSesion = lIniSesion;
+	}
+
+	public JButton getIniciarSesion() {
+		return iniciarSesion;
+	}
+
+	public void setIniciarSesion(JButton iniciarSesion) {
+		this.iniciarSesion = iniciarSesion;
 	}
 
 }

@@ -98,6 +98,42 @@ public class SolteroDAO implements DAO<Soltero>{
 		FileHandler.crearYEscribirArchivoSerializado(URL_ARCHIVO_SERIALIZADO, listaSolteros);
 	}
 	
+	public void leerArchivo(String url) {
+	    String contenido = FileHandler.crearYLeerArchivo(URL_ARCHIVO_TEXTO);
+	    if (contenido == null || contenido.isBlank()) {
+	        return;
+	    }
+
+	    String[] filas = contenido.split("\n");
+	    for (int i = 0; i < filas.length; i++) {
+	        String[] columnas = filas[i].split(";");
+
+	        if (columnas.length < 8) {
+	            System.err.println("Línea inválida en CSV (fila " + (i + 1) + "): " + filas[i]);
+	            continue;
+	        }
+
+	        Soltero temp = new Soltero();
+	        temp.setNombre(columnas[0]);
+	        temp.setApellido(columnas[1]);
+	        temp.setFechaNacimiento(columnas[2]);
+	        temp.setGenero(columnas[3]);
+
+	        try {
+	            temp.setNumeroDocumento(Long.parseLong(columnas[4]));
+	        } catch (NumberFormatException e) {
+	            System.err.println("Error convirtiendo documento en fila " + (i + 1));
+	            continue;
+	        }
+
+	        temp.setUniversidad(columnas[5]);
+	        temp.setProgAcademico(columnas[6]);
+	        temp.setRutaFotoPerfil(columnas[7]);
+
+	        listaSolteros.add(temp);
+	    }
+	}
+	
 	public void leerSerializado() {
 		Object contenido = FileHandler.crearYLeerSerializable(URL_ARCHIVO_SERIALIZADO);
 		if(contenido == null) {
