@@ -10,11 +10,13 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableModel;
 
 import co.edu.unbosque.model.Soltero;
 import co.edu.unbosque.model.persistence.FileHandler;
@@ -36,7 +38,7 @@ public class Controller implements ActionListener {
 
 	private SolteroDAO sDAO;
 	private Soltero solteroActual;
-	
+
 	private VentanaInicial vi;
 	private VentanaRegistroPersona vrp;
 	private VentanaIniciarSesion vis;
@@ -65,14 +67,14 @@ public class Controller implements ActionListener {
 
 		vrp.getSubirFoto().addActionListener(this);
 		vrp.getSubirFoto().setActionCommand("boton_subir_foto");
-		
+
 		vrp.getIniciarSesion().addActionListener(this);
 		vrp.getIniciarSesion().setActionCommand("boton_iniciar_sesion");
 
 		// ------VENTANA INICIAR SESIÓN--------
 		vis.getEntrar().addActionListener(this);
 		vis.getEntrar().setActionCommand("boton_entrar_app");
-		
+
 		// ------VENTANA PRINCIPAL--------
 		vp.getVerPareja().addActionListener(this);
 		vp.getVerPareja().setActionCommand("boton_ver_parejas");
@@ -89,7 +91,7 @@ public class Controller implements ActionListener {
 
 		vrp.getVolver().addActionListener(this);
 		vrp.getVolver().setActionCommand("boton_volver_vrp");
-		
+
 		vis.getVolver().addActionListener(this);
 		vis.getVolver().setActionCommand("boton_volver_vis");
 	}
@@ -128,7 +130,7 @@ public class Controller implements ActionListener {
 			iniciarSesion();
 			break;
 		}
-		case "boton_volver_vis":{
+		case "boton_volver_vis": {
 			vis.setVisible(false);
 			vrp.setVisible(true);
 			break;
@@ -144,6 +146,7 @@ public class Controller implements ActionListener {
 			vp.getPanelPareja().setVisible(false);
 			vp.getPanelMiPerfil().setVisible(false);
 			vp.getPanelSoltero().setVisible(true);
+			mostrarTodosLosSolteros();
 			break;
 		}
 		case "boton_ver_perfil": {
@@ -165,16 +168,16 @@ public class Controller implements ActionListener {
 	}
 
 	// === MÉTODOS PARA REGISTRAR ===
-	
+
 	public void mostrarMiPerfil() {
 		vp.getPanelMiPerfil().getNombre().setText(solteroActual.getNombre());
 		vp.getPanelMiPerfil().getApellido().setText(solteroActual.getApellido());
 		vp.getPanelMiPerfil().getGenero().setText(String.valueOf(solteroActual.getGenero()));
 		vp.getPanelMiPerfil().getUniversidad().setText(solteroActual.getUniversidad());
 		vp.getPanelMiPerfil().getProgAcademico().setText(solteroActual.getProgAcademico());
-		
-		 int edad = calcularEdad(solteroActual.getFechaNacimiento());
-		    vp.getPanelMiPerfil().getFechaNacimiento().setText(edad + " años");
+
+		int edad = calcularEdad(solteroActual.getFechaNacimiento());
+		vp.getPanelMiPerfil().getFechaNacimiento().setText(edad + " años");
 		try {
 			ImageIcon imagen = new ImageIcon(solteroActual.getRutaFotoPerfil());
 			ImageIcon imagenEscalada = new ImageIcon(imagen.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH));
@@ -263,8 +266,9 @@ public class Controller implements ActionListener {
 
 			String rutaFotoPerfil = vrp.getRutaImagenSeleccionada();
 			verificarImagenSeleccionada(rutaFotoPerfil);
-			
-			sDAO.crear(new Soltero(nombre, apellido, fechaNacimiento, genero, numeroDocumento, universidad, progAcademico, rutaFotoPerfil));
+
+			sDAO.crear(new Soltero(nombre, apellido, fechaNacimiento, genero, numeroDocumento, universidad,
+					progAcademico, rutaFotoPerfil));
 			JOptionPane.showMessageDialog(null, "Soltero registrado con éxito¡!");
 
 			limpiarCamposRegistroSoltero();
@@ -285,9 +289,9 @@ public class Controller implements ActionListener {
 			JOptionPane.showMessageDialog(null, "Nombre de universidad no válido.");
 		} catch (UniversityCarrerException e) {
 			JOptionPane.showMessageDialog(null, "Carrera universitaria no válida.");
-		}catch (ImageNotSelectedException e) {
+		} catch (ImageNotSelectedException e) {
 			JOptionPane.showMessageDialog(null, "No ha seleccionado una foto de perfil.");
-		}catch (NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			JOptionPane.showMessageDialog(null, "Número de documento no válido");
 		}
 
@@ -303,43 +307,59 @@ public class Controller implements ActionListener {
 		vrp.getGenero().setSelectedIndex(0);
 		vrp.getFotoPreview().setIcon(null);
 	}
-	
+
 	public void limpiarCampoInicioSesion() {
 		vis.getNumDocumento().setText("");
 	}
-	
+
 	public void iniciarSesion() {
 		try {
-	        long numeroDocumento;
-	        try {
-	            numeroDocumento = Long.parseLong(vis.getNumDocumento().getText());
-	        } catch (NumberFormatException e) {
-	            JOptionPane.showMessageDialog(null, "No se encuentra registrado ese documento");
-	            return;
-	        }
+			long numeroDocumento;
+			try {
+				numeroDocumento = Long.parseLong(vis.getNumDocumento().getText());
+			} catch (NumberFormatException e) {
+				JOptionPane.showMessageDialog(null, "No se encuentra registrado ese documento");
+				return;
+			}
 
-	        verificarDocumento(numeroDocumento);
+			verificarDocumento(numeroDocumento);
 
-	        solteroActual = sDAO.buscarPorDocumento(numeroDocumento);
+			solteroActual = sDAO.buscarPorDocumento(numeroDocumento);
 
-	        if (solteroActual == null) {
-	            JOptionPane.showMessageDialog(null, "No se encuentra registrado ese documento");
-	            return;
-	        }
+			if (solteroActual == null) {
+				JOptionPane.showMessageDialog(null, "No se encuentra registrado ese documento");
+				return;
+			}
 
-	        JOptionPane.showMessageDialog(null, "Bienvenido, " + solteroActual.getNombre() + " a la noche de solteros");
-	        // aquí abres la ventana principal
-	        limpiarCampoInicioSesion();
-	        vis.setVisible(false);
-	        vp.setVisible(true);
+			JOptionPane.showMessageDialog(null, "Bienvenido, " + solteroActual.getNombre() + " a rutila");
+			// aquí abres la ventana principal
+			limpiarCampoInicioSesion();
+			vis.setVisible(false);
+			vp.setVisible(true);
 
-	    } catch (IdException e) {
-	        JOptionPane.showMessageDialog(null, "No se encuentra registrado ese documento");
-	    }
+		} catch (IdException e) {
+			JOptionPane.showMessageDialog(null, "No se encuentra registrado ese documento");
+		}
 	}
-	
+
 	public void mostrarTodosLosSolteros() {
-		
+		String contenido = FileHandler.crearYLeerArchivo("solteros.csv");
+		if (contenido == null || contenido.isBlank()) {
+			return;
+		}
+
+		DefaultTableModel modelo = (DefaultTableModel) vp.getPanelSoltero().getTablaSoltero().getModel();
+		modelo.setRowCount(0);
+
+		String[] filas = contenido.split("\n");
+		for (String fila : filas) {
+			String[] columnas = fila.split(";");
+			if (columnas.length < 8)
+				continue;
+
+			int edad = calcularEdad(columnas[2]);
+			modelo.addRow(new Object[] { columnas[0], columnas[1], columnas[3], edad, columnas[5] });
+		}
 	}
 
 	// === VERIFICAR CAMPOS (EXCEPCIONES) ===
@@ -376,7 +396,7 @@ public class Controller implements ActionListener {
 			throw new LastNameException();
 		}
 	}
-	
+
 	public static void verificarCarrera(String progAcademico) throws UniversityCarrerException {
 		if (progAcademico == null || progAcademico.isEmpty()) {
 			throw new UniversityCarrerException();
@@ -418,7 +438,7 @@ public class Controller implements ActionListener {
 			throw new IdException();
 		}
 	}
-	
+
 	public static void verificarImagenSeleccionada(String imgurl) throws ImageNotSelectedException {
 		if (imgurl == null || imgurl.isEmpty()) {
 			throw new ImageNotSelectedException();
