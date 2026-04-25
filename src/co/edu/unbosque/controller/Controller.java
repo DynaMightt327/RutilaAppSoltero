@@ -20,8 +20,10 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
+import co.edu.unbosque.model.Pareja;
 import co.edu.unbosque.model.Soltero;
 import co.edu.unbosque.model.persistence.FileHandler;
+import co.edu.unbosque.model.persistence.ParejaDAO;
 import co.edu.unbosque.model.persistence.SolteroDAO;
 import co.edu.unbosque.util.exception.BornDateException;
 import co.edu.unbosque.util.exception.ComboBoxException;
@@ -39,6 +41,7 @@ import co.edu.unbosque.view.VentanaRegistroPersona;
 public class Controller implements ActionListener, ListSelectionListener {
 
 	private SolteroDAO sDAO;
+	private ParejaDAO pDAO;
 	private Soltero solteroActual;
 
 	private VentanaInicial vi;
@@ -49,6 +52,7 @@ public class Controller implements ActionListener, ListSelectionListener {
 	public Controller() {
 		FileHandler.crearCarpetaPrincipal();
 		sDAO = new SolteroDAO();
+		pDAO = new ParejaDAO();
 
 		vi = new VentanaInicial();
 		vrp = new VentanaRegistroPersona();
@@ -86,6 +90,9 @@ public class Controller implements ActionListener, ListSelectionListener {
 
 		vp.getMiPerfil().addActionListener(this);
 		vp.getMiPerfil().setActionCommand("boton_ver_perfil");
+		
+		vp.getPanelSoltero().getEmparejar().addActionListener(this);
+		vp.getPanelSoltero().getEmparejar().setActionCommand("boton_emparejar");
 
 		vp.getPanelSoltero().getTablaSoltero().getSelectionModel().addListSelectionListener(this);
 
@@ -160,6 +167,10 @@ public class Controller implements ActionListener, ListSelectionListener {
 			mostrarMiPerfil();
 			break;
 		}
+		case "boton_emparejar":{
+			emparejarConSoltero();
+			break;
+		}
 		case "boton_volver_vp": {
 			vp.setVisible(false);
 			vis.setVisible(true);
@@ -172,24 +183,6 @@ public class Controller implements ActionListener, ListSelectionListener {
 	}
 
 	// === MÉTODOS PARA REGISTRAR ===
-
-	public void mostrarMiPerfil() {
-		vp.getPanelMiPerfil().getNombre().setText(solteroActual.getNombre());
-		vp.getPanelMiPerfil().getApellido().setText(solteroActual.getApellido());
-		vp.getPanelMiPerfil().getGenero().setText(String.valueOf(solteroActual.getGenero()));
-		vp.getPanelMiPerfil().getUniversidad().setText(solteroActual.getUniversidad());
-		vp.getPanelMiPerfil().getProgAcademico().setText(solteroActual.getProgAcademico());
-
-		int edad = calcularEdad(solteroActual.getFechaNacimiento());
-		vp.getPanelMiPerfil().getFechaNacimiento().setText(edad + " años");
-		try {
-			ImageIcon imagen = new ImageIcon(solteroActual.getRutaFotoPerfil());
-			ImageIcon imagenEscalada = new ImageIcon(imagen.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH));
-			vp.getPanelMiPerfil().getFotoPreview().setIcon(imagenEscalada);
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-	}
 
 	public void subirFoto() {
 		try {
@@ -345,6 +338,24 @@ public class Controller implements ActionListener, ListSelectionListener {
 			JOptionPane.showMessageDialog(null, "No se encuentra registrado ese documento");
 		}
 	}
+	
+	public void mostrarMiPerfil() {
+		vp.getPanelMiPerfil().getNombre().setText(solteroActual.getNombre());
+		vp.getPanelMiPerfil().getApellido().setText(solteroActual.getApellido());
+		vp.getPanelMiPerfil().getGenero().setText(String.valueOf(solteroActual.getGenero()));
+		vp.getPanelMiPerfil().getUniversidad().setText(solteroActual.getUniversidad());
+		vp.getPanelMiPerfil().getProgAcademico().setText(solteroActual.getProgAcademico());
+
+		int edad = calcularEdad(solteroActual.getFechaNacimiento());
+		vp.getPanelMiPerfil().getFechaNacimiento().setText(edad + " años");
+		try {
+			ImageIcon imagen = new ImageIcon(solteroActual.getRutaFotoPerfil());
+			ImageIcon imagenEscalada = new ImageIcon(imagen.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH));
+			vp.getPanelMiPerfil().getFotoPreview().setIcon(imagenEscalada);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
 
 	public void mostrarTodosLosSolteros() {
 		String contenido = FileHandler.crearYLeerArchivo("solteros.csv");
@@ -395,7 +406,43 @@ public class Controller implements ActionListener, ListSelectionListener {
 			}
 		}
 	}
+	
+	public void emparejarConSoltero() {
+		int fila = vp.getPanelSoltero().getTablaSoltero().getSelectedRow();
+	    if (fila == -1) {
+	        JOptionPane.showMessageDialog(null, "Selecciona un soltero para realizar esta acción");
+	        return;
+	    }
 
+	    DefaultTableModel modelo = (DefaultTableModel) vp.getPanelSoltero().getTablaSoltero().getModel();
+	    String nombreSeleccionado = modelo.getValueAt(fila, 0).toString();
+
+	    Soltero solteroSeleccionado = null;
+	    ArrayList<Soltero> listaSolteros = sDAO.getListaSolteros();
+
+	    for (Soltero soltero : listaSolteros) {
+	        if (soltero.getNombre().equals(nombreSeleccionado)) {
+	            solteroSeleccionado = soltero;
+	            break;
+	        }
+	    }
+
+	    if (solteroSeleccionado == null) {
+	        JOptionPane.showMessageDialog(null, "No se encontró el soltero");
+	        return;
+	    }
+
+	    if (solteroSeleccionado.getNumeroDocumento() == solteroActual.getNumeroDocumento()) {
+	        JOptionPane.showMessageDialog(null, "No puedes emparejarte contigo mismo");
+	        return;
+	    }
+	    //falta para juntar la pareja y eliminar los solteros
+	    JOptionPane.showMessageDialog(null, "¡Pareja formada con éxito!");
+
+	    mostrarTodosLosSolteros();
+
+	}
+	
 	// === VERIFICAR CAMPOS (EXCEPCIONES) ===
 
 	public static void verificarComboBox(String genero) throws ComboBoxException {
