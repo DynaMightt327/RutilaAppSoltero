@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
@@ -34,7 +36,7 @@ import co.edu.unbosque.view.VentanaIniciarSesion;
 import co.edu.unbosque.view.VentanaPrincipal;
 import co.edu.unbosque.view.VentanaRegistroPersona;
 
-public class Controller implements ActionListener {
+public class Controller implements ActionListener, ListSelectionListener {
 
 	private SolteroDAO sDAO;
 	private Soltero solteroActual;
@@ -84,6 +86,8 @@ public class Controller implements ActionListener {
 
 		vp.getMiPerfil().addActionListener(this);
 		vp.getMiPerfil().setActionCommand("boton_ver_perfil");
+
+		vp.getPanelSoltero().getTablaSoltero().getSelectionModel().addListSelectionListener(this);
 
 		// --------BOTONES PARA VOLVER A VENTANA ANTERIOR--------
 		vp.getVolver().addActionListener(this);
@@ -362,6 +366,36 @@ public class Controller implements ActionListener {
 		}
 	}
 
+	public void mostrarDetallesSolteroSeleccionado() {
+		int fila = vp.getPanelSoltero().getTablaSoltero().getSelectedRow();
+		if (fila == -1) {
+			return;
+		}
+
+		DefaultTableModel modelo = (DefaultTableModel) vp.getPanelSoltero().getTablaSoltero().getModel();
+
+		String nombreSeleccionado = modelo.getValueAt(fila, 0).toString();
+
+		ArrayList<Soltero> lista = sDAO.getListaSolteros();
+
+		for (Soltero solteroSeleccionado : lista) {
+			if (solteroSeleccionado.getNombre().equals(nombreSeleccionado)) {
+				vp.getPanelSoltero().getNombre().setText(solteroSeleccionado.getNombre());
+				vp.getPanelSoltero().getApellido().setText(solteroSeleccionado.getApellido());
+				vp.getPanelSoltero().getUniversidad().setText(solteroSeleccionado.getUniversidad());
+				vp.getPanelSoltero().getGenero().setText(solteroSeleccionado.getGenero());
+				vp.getPanelSoltero().getProgAcademico().setText(solteroSeleccionado.getProgAcademico());
+				int edad = calcularEdad(solteroSeleccionado.getFechaNacimiento());
+				vp.getPanelSoltero().getFechaNacimiento().setText(edad + " años");
+				ImageIcon imagen = new ImageIcon(solteroSeleccionado.getRutaFotoPerfil());
+				ImageIcon imagenEscalada = new ImageIcon(imagen.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH));
+				vp.getPanelSoltero().getFotoPreview().setIcon(imagenEscalada);
+				
+				break;
+			}
+		}
+	}
+
 	// === VERIFICAR CAMPOS (EXCEPCIONES) ===
 
 	public static void verificarComboBox(String genero) throws ComboBoxException {
@@ -445,8 +479,15 @@ public class Controller implements ActionListener {
 		}
 	}
 
+	@Override
+	public void valueChanged(ListSelectionEvent e) {
+		 if (e.getValueIsAdjusting()) return;
+		 mostrarDetallesSolteroSeleccionado();
+	}
+
 	public void iniciar() {
 		vi.setVisible(true);
 	}
+
 
 }
