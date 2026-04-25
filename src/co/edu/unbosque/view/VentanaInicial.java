@@ -7,7 +7,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JTextArea;
 
 public class VentanaInicial extends JFrame {
 
@@ -15,8 +14,8 @@ public class VentanaInicial extends JFrame {
 	private JLabel background;
 	private JButton iniciar;
 	private JLabel info;
-	
-	//BOTONES DE IDIOMAS
+
+	// BOTONES DE IDIOMAS
 	private JButton espanol;
 	private JButton ingles;
 	private JButton frances;
@@ -65,7 +64,7 @@ public class VentanaInicial extends JFrame {
 		iniciar.setBorderPainted(false);
 		iniciar.setFocusPainted(false);
 		background.add(iniciar);
-	
+
 		ImageIcon imagen1 = new ImageIcon(getClass().getResource("spanish.png"));
 		JLabel labelImagen1 = new JLabel(imagen1);
 		espanol = new JButton(imagen1);
@@ -74,7 +73,7 @@ public class VentanaInicial extends JFrame {
 		espanol.setFocusPainted(false);
 		espanol.setBorderPainted(false);
 		background.add(espanol);
-		
+
 		ImageIcon imagen2 = new ImageIcon(getClass().getResource("english.png"));
 		JLabel labelImagen2 = new JLabel(imagen2);
 		ingles = new JButton(imagen2);
@@ -86,7 +85,7 @@ public class VentanaInicial extends JFrame {
 
 		ImageIcon imagen3 = new ImageIcon(getClass().getResource("francess.png"));
 		JLabel labelImagen3 = new JLabel(imagen3);
-		frances= new JButton(imagen3);
+		frances = new JButton(imagen3);
 		frances.setBounds(245, 580, 50, 50);
 		frances.setContentAreaFilled(false);
 		frances.setFocusPainted(false);
@@ -120,6 +119,7 @@ public class VentanaInicial extends JFrame {
 		japones.setBorderPainted(false);
 		background.add(japones);
 	}
+
 
 	public JLabel getTitulo() {
 		return titulo;
@@ -197,5 +197,4 @@ public class VentanaInicial extends JFrame {
 		this.japones = japones;
 	}
 
-	
 }

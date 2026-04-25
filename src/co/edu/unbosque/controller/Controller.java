@@ -4,6 +4,8 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
@@ -11,6 +13,7 @@ import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -49,8 +52,12 @@ public class Controller implements ActionListener, ListSelectionListener {
 	private VentanaIniciarSesion vis;
 	private VentanaPrincipal vp;
 
+	private Properties propiedades;
+
 	public Controller() {
 		FileHandler.crearCarpetaPrincipal();
+		propiedades = new Properties();
+
 		sDAO = new SolteroDAO();
 		pDAO = new ParejaDAO();
 
@@ -60,12 +67,41 @@ public class Controller implements ActionListener, ListSelectionListener {
 		vp = new VentanaPrincipal();
 
 		asignarOyentes();
+		cargarIdioma("spanish");
+	}
+
+	public void cargarIdioma(String archivo) {
+		try {
+			propiedades = new Properties();
+			propiedades.load(new FileInputStream(new File("files/" + archivo + ".properties")));
+			aplicarCambioIdioma();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void asignarOyentes() {
 		// ------VENTANA INICIAL---------
 		vi.getIniciar().addActionListener(this);
 		vi.getIniciar().setActionCommand("boton_iniciar");
+
+		vi.getEspanol().addActionListener(this);
+		vi.getEspanol().setActionCommand("idioma_espanol");
+
+		vi.getIngles().addActionListener(this);
+		vi.getIngles().setActionCommand("idioma_ingles");
+
+		vi.getFrances().addActionListener(this);
+		vi.getFrances().setActionCommand("idioma_frances");
+
+		vi.getRuso().addActionListener(this);
+		vi.getRuso().setActionCommand("idioma_ruso");
+
+		vi.getLatin().addActionListener(this);
+		vi.getLatin().setActionCommand("idioma_latin");
+
+		vi.getJapones().addActionListener(this);
+		vi.getJapones().setActionCommand("idioma_japones");
 
 		// ------VENTANA REGISTRO PERSONA------
 		vrp.getGuardarPersona().addActionListener(this);
@@ -77,6 +113,8 @@ public class Controller implements ActionListener, ListSelectionListener {
 		vrp.getIniciarSesion().addActionListener(this);
 		vrp.getIniciarSesion().setActionCommand("boton_iniciar_sesion");
 
+		vrp.getChangeLanguage().addActionListener(this);
+		vrp.getChangeLanguage().setActionCommand("cambio_idioma_vrp");
 		// ------VENTANA INICIAR SESIÓN--------
 		vis.getEntrar().addActionListener(this);
 		vis.getEntrar().setActionCommand("boton_entrar_app");
@@ -90,11 +128,14 @@ public class Controller implements ActionListener, ListSelectionListener {
 
 		vp.getMiPerfil().addActionListener(this);
 		vp.getMiPerfil().setActionCommand("boton_ver_perfil");
-		
+
 		vp.getPanelSoltero().getEmparejar().addActionListener(this);
 		vp.getPanelSoltero().getEmparejar().setActionCommand("boton_emparejar");
 
 		vp.getPanelSoltero().getTablaSoltero().getSelectionModel().addListSelectionListener(this);
+
+		vp.getChangeLanguage().addActionListener(this);
+		vp.getChangeLanguage().setActionCommand("cambio_idioma_vp");
 
 		// --------BOTONES PARA VOLVER A VENTANA ANTERIOR--------
 		vp.getVolver().addActionListener(this);
@@ -167,13 +208,87 @@ public class Controller implements ActionListener, ListSelectionListener {
 			mostrarMiPerfil();
 			break;
 		}
-		case "boton_emparejar":{
+		case "boton_emparejar": {
 			emparejarConSoltero();
 			break;
 		}
 		case "boton_volver_vp": {
 			vp.setVisible(false);
 			vis.setVisible(true);
+			break;
+		}
+		// == APLICAR CAMBIO DE IDIOMA ==
+		case "idioma_espanol": {
+			cargarIdioma("spanish");
+			break;
+		}
+		case "idioma_ingles": {
+			cargarIdioma("english");
+			break;
+		}
+		case "idioma_frances": {
+			cargarIdioma("french");
+			break;
+		}
+		case "idioma_ruso": {
+			cargarIdioma("russian");
+			break;
+		}
+		case "idioma_latin": {
+			cargarIdioma("latin");
+			break;
+		}
+		case "idioma_japones": {
+			cargarIdioma("japanese");
+			break;
+		}
+		case "cambio_idioma_vrp": {
+			int seleccion = vrp.getChangeLanguage().getSelectedIndex();
+			switch (seleccion) {
+			case 1:
+				cargarIdioma("spanish");
+				break;
+			case 2:
+				cargarIdioma("english");
+				break;
+			case 3:
+				cargarIdioma("french");
+				break;
+			case 4:
+				cargarIdioma("russian");
+				break;
+			case 5:
+				cargarIdioma("latin");
+				break;
+			case 6:
+				cargarIdioma("japanese");
+				break;
+
+			}
+			break;
+		}
+		case "cambio_idioma_vp": {
+			int seleccion = vp.getChangeLanguage().getSelectedIndex();
+			switch (seleccion) {
+			case 1:
+				cargarIdioma("spanish");
+				break;
+			case 2:
+				cargarIdioma("english");
+				break;
+			case 3:
+				cargarIdioma("french");
+				break;
+			case 4:
+				cargarIdioma("russian");
+				break;
+			case 5:
+				cargarIdioma("latin");
+				break;
+			case 6:
+				cargarIdioma("japanese");
+				break;
+			}
 			break;
 		}
 		default:
@@ -338,7 +453,7 @@ public class Controller implements ActionListener, ListSelectionListener {
 			JOptionPane.showMessageDialog(null, "No se encuentra registrado ese documento");
 		}
 	}
-	
+
 	public void mostrarMiPerfil() {
 		vp.getPanelMiPerfil().getNombre().setText(solteroActual.getNombre());
 		vp.getPanelMiPerfil().getApellido().setText(solteroActual.getApellido());
@@ -399,50 +514,51 @@ public class Controller implements ActionListener, ListSelectionListener {
 				int edad = calcularEdad(solteroSeleccionado.getFechaNacimiento());
 				vp.getPanelSoltero().getFechaNacimiento().setText(edad + " años");
 				ImageIcon imagen = new ImageIcon(solteroSeleccionado.getRutaFotoPerfil());
-				ImageIcon imagenEscalada = new ImageIcon(imagen.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH));
+				ImageIcon imagenEscalada = new ImageIcon(
+						imagen.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH));
 				vp.getPanelSoltero().getFotoPreview().setIcon(imagenEscalada);
-				
+
 				break;
 			}
 		}
 	}
-	
+
 	public void emparejarConSoltero() {
 		int fila = vp.getPanelSoltero().getTablaSoltero().getSelectedRow();
-	    if (fila == -1) {
-	        JOptionPane.showMessageDialog(null, "Selecciona un soltero para realizar esta acción");
-	        return;
-	    }
+		if (fila == -1) {
+			JOptionPane.showMessageDialog(null, "Selecciona un soltero para realizar esta acción");
+			return;
+		}
 
-	    DefaultTableModel modelo = (DefaultTableModel) vp.getPanelSoltero().getTablaSoltero().getModel();
-	    String nombreSeleccionado = modelo.getValueAt(fila, 0).toString();
+		DefaultTableModel modelo = (DefaultTableModel) vp.getPanelSoltero().getTablaSoltero().getModel();
+		String nombreSeleccionado = modelo.getValueAt(fila, 0).toString();
 
-	    Soltero solteroSeleccionado = null;
-	    ArrayList<Soltero> listaSolteros = sDAO.getListaSolteros();
+		Soltero solteroSeleccionado = null;
+		ArrayList<Soltero> listaSolteros = sDAO.getListaSolteros();
 
-	    for (Soltero soltero : listaSolteros) {
-	        if (soltero.getNombre().equals(nombreSeleccionado)) {
-	            solteroSeleccionado = soltero;
-	            break;
-	        }
-	    }
+		for (Soltero soltero : listaSolteros) {
+			if (soltero.getNombre().equals(nombreSeleccionado)) {
+				solteroSeleccionado = soltero;
+				break;
+			}
+		}
 
-	    if (solteroSeleccionado == null) {
-	        JOptionPane.showMessageDialog(null, "No se encontró el soltero");
-	        return;
-	    }
+		if (solteroSeleccionado == null) {
+			JOptionPane.showMessageDialog(null, "No se encontró el soltero");
+			return;
+		}
 
-	    if (solteroSeleccionado.getNumeroDocumento() == solteroActual.getNumeroDocumento()) {
-	        JOptionPane.showMessageDialog(null, "No puedes emparejarte contigo mismo");
-	        return;
-	    }
-	    //falta para juntar la pareja y eliminar los solteros
-	    JOptionPane.showMessageDialog(null, "¡Pareja formada con éxito!");
+		if (solteroSeleccionado.getNumeroDocumento() == solteroActual.getNumeroDocumento()) {
+			JOptionPane.showMessageDialog(null, "No puedes emparejarte contigo mismo");
+			return;
+		}
+		// falta para juntar la pareja y eliminar los solteros
+		JOptionPane.showMessageDialog(null, "¡Pareja formada con éxito!");
 
-	    mostrarTodosLosSolteros();
+		mostrarTodosLosSolteros();
 
 	}
-	
+
 	// === VERIFICAR CAMPOS (EXCEPCIONES) ===
 
 	public static void verificarComboBox(String genero) throws ComboBoxException {
@@ -528,13 +644,129 @@ public class Controller implements ActionListener, ListSelectionListener {
 
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
-		 if (e.getValueIsAdjusting()) return;
-		 mostrarDetallesSolteroSeleccionado();
+		if (e.getValueIsAdjusting())
+			return;
+		mostrarDetallesSolteroSeleccionado();
+	}
+
+	public void aplicarCambioIdioma() {
+		// ventana inicial
+		vi.getInfo().setText(propiedades.getProperty("panel.ventanaInicial.infoIdioma").trim());
+		vi.getIniciar().setText(propiedades.getProperty("panel.ventanaInicial.infoApp").trim());
+
+		// ventana registro persona
+		vrp.getTitulo().setText(propiedades.getProperty("panel.ventanaregistroPersona.titulo").trim());
+		vrp.getInfo().setText(propiedades.getProperty("panel.ventanaregistroPersona.infoPersona").trim());
+		vrp.getLabel1().setText(propiedades.getProperty("panel.ventanaregistroPersona.nombre").trim());
+		vrp.getLabel2().setText(propiedades.getProperty("panel.ventanaregistroPersona.apellido").trim());
+		vrp.getLabel3().setText(propiedades.getProperty("panel.ventanaregistroPersona.fechaNacimiento").trim());
+		vrp.getLabel4().setText(propiedades.getProperty("panel.ventanaregistroPersona.programaAcademico").trim());
+		vrp.getLabel5().setText(propiedades.getProperty("panel.ventanaregistroPersona.universidad").trim());
+		vrp.getLabel6().setText(propiedades.getProperty("panel.ventanaregistroPersona.numeroDocumento").trim());
+		vrp.getLabel7().setText(propiedades.getProperty("panel.ventanaregistroPersona.genero").trim());
+		vrp.getLabel8().setText(propiedades.getProperty("panel.ventanaregistroPersona.fotoPerfil").trim());
+		vrp.getSubirFoto().setText(propiedades.getProperty("panel.ventanaregistroPersona.subirFoto").trim());
+		vrp.getGuardarPersona().setText(propiedades.getProperty("panel.ventanaregistroPersona.guardar").trim());
+		vrp.getVolver().setText(propiedades.getProperty("panel.ventanaregistroPersona.boton.volver").trim());
+
+		vrp.getGenero().removeActionListener(this);
+		vrp.getGenero().removeAllItems();
+		vrp.getGenero().addItem("...");
+		vrp.getGenero().addItem(propiedades.getProperty("panel.ventanaregistroPersona.femenino").trim());
+		vrp.getGenero().addItem(propiedades.getProperty("panel.ventanaregistroPersona.masculino").trim());
+		vrp.getGenero().addActionListener(this);
+
+		// listaRegisto perdsona
+		vrp.getChangeLanguage().removeActionListener(this);
+		vrp.getChangeLanguage().removeAllItems();
+		vrp.getChangeLanguage()
+				.addItem(propiedades.getProperty("panel.ventanaregistroPersona.listaIdiomas.cambio").trim());
+		vrp.getChangeLanguage()
+				.addItem(propiedades.getProperty("panel.ventanaregistroPersona.listaIdiomas.español").trim());
+		vrp.getChangeLanguage()
+				.addItem(propiedades.getProperty("panel.ventanaregistroPersona.listaIdiomas.ingles").trim());
+		vrp.getChangeLanguage()
+				.addItem(propiedades.getProperty("panel.ventanaregistroPersona.listaIdiomas.frances").trim());
+		vrp.getChangeLanguage()
+				.addItem(propiedades.getProperty("panel.ventanaregistroPersona.listaIdiomas.ruso").trim());
+		vrp.getChangeLanguage()
+				.addItem(propiedades.getProperty("panel.ventanaregistroPersona.listaIdiomas.latin").trim());
+		vrp.getChangeLanguage()
+				.addItem(propiedades.getProperty("panel.ventanaregistroPersona.listaIdiomas.japones").trim());
+		vrp.getChangeLanguage().addActionListener(this);
+
+		// ventana principal
+		vp.getTitulo().setText(propiedades.getProperty("panel.ventanaPrincipal.titulo").trim());
+		vp.getMiPerfil().setText(propiedades.getProperty("panel.ventanaPrincipal.boton.perfil").trim());
+		vp.getVerSoltero().setText(propiedades.getProperty("panel.ventanaPrincipal.boton.solteros").trim());
+		vp.getVerPareja().setText(propiedades.getProperty("panel.ventanaPrincipal.boton.parejas").trim());
+		vp.getVolver().setText(propiedades.getProperty("panel.ventanaPrincipal.boton.volver").trim());
+
+		// lista v principal
+		vp.getChangeLanguage().removeActionListener(this);
+		vp.getChangeLanguage().removeAllItems();
+		vp.getChangeLanguage().addItem(propiedades.getProperty("panel.ventanaPrincipal.listaIdiomas.cambio").trim());
+		vp.getChangeLanguage().addItem(propiedades.getProperty("panel.ventanaPrincipal.listaIdiomas.español").trim());
+		vp.getChangeLanguage().addItem(propiedades.getProperty("panel.ventanaPrincipal.listaIdiomas.ingles").trim());
+		vp.getChangeLanguage().addItem(propiedades.getProperty("panel.ventanaPrincipal.listaIdiomas.frances").trim());
+		vp.getChangeLanguage().addItem(propiedades.getProperty("panel.ventanaPrincipal.listaIdiomas.ruso").trim());
+		vp.getChangeLanguage().addItem(propiedades.getProperty("panel.ventanaPrincipal.listaIdiomas.latin").trim());
+		vp.getChangeLanguage().addItem(propiedades.getProperty("panel.ventanaPrincipal.listaIdiomas.japones").trim());
+		vp.getChangeLanguage().addActionListener(this);
+
+		// panel soltero
+		vp.getPanelSoltero().getTitulo().setText(propiedades.getProperty("panel.soltero.titulo").trim());
+		vp.getPanelSoltero().getEmparejar().setText(propiedades.getProperty("panel.soltero.boton.emparejar").trim());
+		vp.getPanelSoltero().getLabel1().setText(propiedades.getProperty("panel.soltero.nombre").trim());
+		vp.getPanelSoltero().getLabel2().setText(propiedades.getProperty("panel.soltero.apellido").trim());
+		vp.getPanelSoltero().getLabel3().setText(propiedades.getProperty("panel.soltero.edad").trim());
+		vp.getPanelSoltero().getLabel4().setText(propiedades.getProperty("panel.soltero.carrera").trim());
+		vp.getPanelSoltero().getLabel5().setText(propiedades.getProperty("panel.soltero.universidad").trim());
+		vp.getPanelSoltero().getLabel6().setText(propiedades.getProperty("panel.soltero.genero").trim());
+
+		vp.getPanelSoltero().getTablaSoltero().getColumnModel().getColumn(0)
+				.setHeaderValue(propiedades.getProperty("panel.soltero.columna.nombre").trim());
+		vp.getPanelSoltero().getTablaSoltero().getColumnModel().getColumn(1)
+				.setHeaderValue(propiedades.getProperty("panel.soltero.columna.apellido").trim());
+		vp.getPanelSoltero().getTablaSoltero().getColumnModel().getColumn(2)
+				.setHeaderValue(propiedades.getProperty("panel.soltero.columna.genero").trim());
+		vp.getPanelSoltero().getTablaSoltero().getColumnModel().getColumn(3)
+				.setHeaderValue(propiedades.getProperty("panel.soltero.columna.edad").trim());
+		vp.getPanelSoltero().getTablaSoltero().getColumnModel().getColumn(4)
+				.setHeaderValue(propiedades.getProperty("panel.soltero.columna.universidad").trim());
+		vp.getPanelSoltero().getTablaSoltero().getTableHeader().repaint();
+
+		// panel pareja
+		vp.getPanelPareja().getTitulo().setText(propiedades.getProperty("panel.pareja.titulo").trim());
+		vp.getPanelPareja().getRomperPareja()
+				.setText(propiedades.getProperty("panel.pareja.boton.separarPareja").trim());
+
+		vp.getPanelPareja().getLabel1().setText(propiedades.getProperty("panel.pareja.persona1.nombre").trim());
+		vp.getPanelPareja().getLabel2().setText(propiedades.getProperty("panel.pareja.persona1.apellido").trim());
+		vp.getPanelPareja().getLabel3().setText(propiedades.getProperty("panel.pareja.persona1.edad").trim());
+		vp.getPanelPareja().getLabel4().setText(propiedades.getProperty("panel.pareja.persona1.carrera").trim());
+		vp.getPanelPareja().getLabel5().setText(propiedades.getProperty("panel.pareja.persona1.universidad").trim());
+		vp.getPanelPareja().getLabel6().setText(propiedades.getProperty("panel.pareja.persona1.genero").trim());
+
+		vp.getPanelPareja().getLabel7().setText(propiedades.getProperty("panel.pareja.persona2.nombre").trim());
+		vp.getPanelPareja().getLabel8().setText(propiedades.getProperty("panel.pareja.persona2.apellido").trim());
+		vp.getPanelPareja().getLabel9().setText(propiedades.getProperty("panel.pareja.persona2.edad").trim());
+		vp.getPanelPareja().getLabel12().setText(propiedades.getProperty("panel.pareja.persona2.carrera").trim());
+		vp.getPanelPareja().getLabel11().setText(propiedades.getProperty("panel.pareja.persona2.universidad").trim());
+		vp.getPanelPareja().getLabel10().setText(propiedades.getProperty("panel.pareja.persona2.genero").trim());
+
+		// panel mi perfil
+		vp.getPanelMiPerfil().getLabel1().setText(propiedades.getProperty("panel.miPerfil.nombre").trim());
+		vp.getPanelMiPerfil().getLabel2().setText(propiedades.getProperty("panel.miPerfil.apellido").trim());
+		vp.getPanelMiPerfil().getLabel3().setText(propiedades.getProperty("panel.miPerfil.edad").trim());
+		vp.getPanelMiPerfil().getLabel4().setText(propiedades.getProperty("panel.miPerfil.carrera").trim());
+		vp.getPanelMiPerfil().getLabel5().setText(propiedades.getProperty("panel.miPerfil.universidad").trim());
+		vp.getPanelMiPerfil().getLabel6().setText(propiedades.getProperty("panel.miPerfil.genero").trim());
+
 	}
 
 	public void iniciar() {
 		vi.setVisible(true);
 	}
-
 
 }
