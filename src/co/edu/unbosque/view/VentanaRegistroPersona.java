@@ -161,7 +161,7 @@ public class VentanaRegistroPersona extends JFrame{
 		add(label8);
 		
 		subirFoto = new JButton("Subir foto");
-		subirFoto.setBounds(540, 260, 100, 35);
+		subirFoto.setBounds(540, 260, 130, 35);
 		subirFoto.setBackground(Color.decode("#ab1a1c"));
 		subirFoto.setForeground(Color.white);
 		subirFoto.setBorderPainted(false);

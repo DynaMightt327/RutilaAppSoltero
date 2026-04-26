@@ -668,6 +668,8 @@ public class Controller implements ActionListener, ListSelectionListener {
 		vrp.getSubirFoto().setText(propiedades.getProperty("panel.ventanaregistroPersona.subirFoto").trim());
 		vrp.getGuardarPersona().setText(propiedades.getProperty("panel.ventanaregistroPersona.guardar").trim());
 		vrp.getVolver().setText(propiedades.getProperty("panel.ventanaregistroPersona.boton.volver").trim());
+		vrp.getlIniSesion().setText(propiedades.getProperty("panel.ventanaregistroPersona.label.cuentacreada").trim());
+		vrp.getIniciarSesion().setText(propiedades.getProperty("panel.ventanaregistroPersona.boton.iniciarsesion").trim());
 
 		vrp.getGenero().removeActionListener(this);
 		vrp.getGenero().removeAllItems();
@@ -676,7 +678,7 @@ public class Controller implements ActionListener, ListSelectionListener {
 		vrp.getGenero().addItem(propiedades.getProperty("panel.ventanaregistroPersona.masculino").trim());
 		vrp.getGenero().addActionListener(this);
 
-		// listaRegisto perdsona
+		// listaRegisto persona
 		vrp.getChangeLanguage().removeActionListener(this);
 		vrp.getChangeLanguage().removeAllItems();
 		vrp.getChangeLanguage()
@@ -694,6 +696,12 @@ public class Controller implements ActionListener, ListSelectionListener {
 		vrp.getChangeLanguage()
 				.addItem(propiedades.getProperty("panel.ventanaregistroPersona.listaIdiomas.japones").trim());
 		vrp.getChangeLanguage().addActionListener(this);
+		
+		//ventana iniciar sesion
+		vis.getInfo().setText(propiedades.getProperty("panel.ventanainiciarsesion.label.informacion").trim());
+		vis.getLabelDoc().setText(propiedades.getProperty("panel.ventanainiciarsesion.label.numerodocumento").trim());
+		vis.getVolver().setText(propiedades.getProperty("panel.ventanainiciarsesion.boton.volver").trim());
+		vis.getEntrar().setText(propiedades.getProperty("panel.ventanainiciarsesion.boton.entrar").trim());
 
 		// ventana principal
 		vp.getTitulo().setText(propiedades.getProperty("panel.ventanaPrincipal.titulo").trim());
