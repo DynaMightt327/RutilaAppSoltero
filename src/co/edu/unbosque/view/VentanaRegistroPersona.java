@@ -63,8 +63,9 @@ public class VentanaRegistroPersona extends JFrame{
 		this.add(lImage);
 		
 		titulo = new JTextArea("¿ESTÁS LISTO PARA SER PARTE \nDE LA NOCHE DE SOLTEROS?");
-		titulo.setBounds(100, 80, 750, 120);
+		titulo.setBounds(100, 80, 820, 120);
 		titulo.setFont(new Font("Arial", Font.BOLD, 45));
+		titulo.setOpaque(true);
 		titulo.setForeground(Color.white);
 		titulo.setBackground(Color.decode("#270205"));
 		titulo.setEditable(false);

@@ -1,7 +1,10 @@
 package co.edu.unbosque.view;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Font;
+import java.util.Properties;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -43,8 +46,8 @@ public class VentanaInicial extends JFrame {
 		background.setLayout(null);
 		this.getContentPane().add(background);
 
-		titulo = new JLabel("RUTILA BAR");
-		titulo.setBounds(100, 300, 400, 70);
+		titulo = new JLabel("BAR RUTILA");
+		titulo.setBounds(100, 300, 600, 70);
 		titulo.setFont(new Font("Arial", Font.BOLD, 65));
 		titulo.setForeground(Color.white);
 		titulo.setBackground(null);
@@ -119,7 +122,6 @@ public class VentanaInicial extends JFrame {
 		japones.setBorderPainted(false);
 		background.add(japones);
 	}
-
 
 	public JLabel getTitulo() {
 		return titulo;

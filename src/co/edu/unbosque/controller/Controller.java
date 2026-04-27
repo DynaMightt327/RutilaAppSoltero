@@ -131,8 +131,12 @@ public class Controller implements ActionListener, ListSelectionListener {
 
 		vp.getPanelSoltero().getEmparejar().addActionListener(this);
 		vp.getPanelSoltero().getEmparejar().setActionCommand("boton_emparejar");
+		
+		vp.getPanelPareja().getRomperPareja().addActionListener(this);
+		vp.getPanelPareja().getRomperPareja().setActionCommand("boton_romper_pareja");
 
 		vp.getPanelSoltero().getTablaSoltero().getSelectionModel().addListSelectionListener(this);
+		vp.getPanelPareja().getTablaPareja().getSelectionModel().addListSelectionListener(this);
 
 		vp.getChangeLanguage().addActionListener(this);
 		vp.getChangeLanguage().setActionCommand("cambio_idioma_vp");
@@ -171,6 +175,8 @@ public class Controller implements ActionListener, ListSelectionListener {
 		case "boton_volver_vrp": {
 			vrp.setVisible(false);
 			vi.setVisible(true);
+			limpiarCamposRegistroSoltero();
+			
 			break;
 		}
 		case "boton_subir_foto": {
@@ -192,6 +198,7 @@ public class Controller implements ActionListener, ListSelectionListener {
 			vp.getPanelSoltero().setVisible(false);
 			vp.getPanelMiPerfil().setVisible(false);
 			vp.getPanelPareja().setVisible(true);
+			mostrarTodasLasParejas();
 			break;
 		}
 		case "boton_ver_solteros": {
@@ -211,6 +218,10 @@ public class Controller implements ActionListener, ListSelectionListener {
 		case "boton_emparejar": {
 			emparejarConSoltero();
 			break;
+		}
+		case "boton_romper_pareja": {
+		    romperPareja();
+		    break;
 		}
 		case "boton_volver_vp": {
 			vp.setVisible(false);
@@ -330,7 +341,8 @@ public class Controller implements ActionListener, ListSelectionListener {
 				ImageIcon scaled = new ImageIcon(image.getImage().getScaledInstance(160, 160, Image.SCALE_SMOOTH));
 				vrp.getFotoPreview().setIcon(scaled);
 
-				JOptionPane.showMessageDialog(null, "Imagen cargada con éxito");
+				JOptionPane.showMessageDialog(null,
+						propiedades.getProperty("appsoltero.joptionpane.messagedialog.imagencargada.exitosa"));
 
 			} else {
 				// excepcion de imagen no seleccionada
@@ -348,7 +360,8 @@ public class Controller implements ActionListener, ListSelectionListener {
 			return Period.between(fechaNac, hoy).getYears();
 
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(vi, "Eres menor de edad aún. No es posible tu ingreso al bar**");
+			JOptionPane.showMessageDialog(vi,
+					propiedades.getProperty("appsoltero.joptionpane.messagedialog.controledad"));
 			return 0;
 		}
 	}
@@ -381,30 +394,34 @@ public class Controller implements ActionListener, ListSelectionListener {
 
 			sDAO.crear(new Soltero(nombre, apellido, fechaNacimiento, genero, numeroDocumento, universidad,
 					progAcademico, rutaFotoPerfil));
-			JOptionPane.showMessageDialog(null, "Soltero registrado con éxito¡!");
+			JOptionPane.showMessageDialog(null,
+					propiedades.getProperty("appsoltero.joptionpane.messagedialog.registroexitoso"));
 
 			limpiarCamposRegistroSoltero();
 
 			vrp.setVisible(false);
 			vis.setVisible(true);
 		} catch (BornDateException e) {
-			JOptionPane.showMessageDialog(null, "La fecha de nacimiento no es correcta");
+			JOptionPane.showMessageDialog(null,
+					propiedades.getProperty("appsoltero.joptionpane.excepciones.fechanacimiento"));
 		} catch (ComboBoxException e) {
-			JOptionPane.showMessageDialog(null, "No ha seleccionado su género.");
+			JOptionPane.showMessageDialog(null, propiedades.getProperty("appsoltero.joptionpane.excepciones.genero"));
 		} catch (IdException e) {
-			JOptionPane.showMessageDialog(null, "Número de documento no válido");
+			JOptionPane.showMessageDialog(null,
+					propiedades.getProperty("appsoltero.joptionpane.excepciones.documento"));
 		} catch (LastNameException e) {
-			JOptionPane.showMessageDialog(null, "Apellido no válido");
+			JOptionPane.showMessageDialog(null, propiedades.getProperty("appsoltero.joptionpane.excepciones.apellido"));
 		} catch (NameException e) {
-			JOptionPane.showMessageDialog(null, "Nombre no válido");
+			JOptionPane.showMessageDialog(null, propiedades.getProperty("appsoltero.joptionpane.excepciones.nombre"));
 		} catch (UniversityException e) {
-			JOptionPane.showMessageDialog(null, "Nombre de universidad no válido.");
+			JOptionPane.showMessageDialog(null,
+					propiedades.getProperty("appsoltero.joptionpane.excepciones.universidad"));
 		} catch (UniversityCarrerException e) {
-			JOptionPane.showMessageDialog(null, "Carrera universitaria no válida.");
+			JOptionPane.showMessageDialog(null, propiedades.getProperty("appsoltero.joptionpane.excepciones.carrera"));
 		} catch (ImageNotSelectedException e) {
-			JOptionPane.showMessageDialog(null, "No ha seleccionado una foto de perfil.");
+			JOptionPane.showMessageDialog(null, propiedades.getProperty("appsoltero.joptionpane.excepciones.imagen"));
 		} catch (NumberFormatException e) {
-			JOptionPane.showMessageDialog(null, "Número de documento no válido");
+			JOptionPane.showMessageDialog(null, propiedades.getProperty("appsoltero.joptionpane.excepciones.number"));
 		}
 
 	}
@@ -423,14 +440,43 @@ public class Controller implements ActionListener, ListSelectionListener {
 	public void limpiarCampoInicioSesion() {
 		vis.getNumDocumento().setText("");
 	}
+	
+	public void limpiarCamposAlBorrarPareja() {
+		vp.getPanelPareja().getNombre1().setText("");
+		vp.getPanelPareja().getNombre2().setText("");
+		vp.getPanelPareja().getApellido1().setText("");
+		vp.getPanelPareja().getApellido2().setText("");
+		vp.getPanelPareja().getFechaNacimiento1().setText("");
+		vp.getPanelPareja().getFechaNacimiento2().setText("");
+		vp.getPanelPareja().getProgAcademico1().setText("");
+		vp.getPanelPareja().getProgAcademico2().setText("");
+		vp.getPanelPareja().getUniversidad1().setText("");
+		vp.getPanelPareja().getUniversidad2().setText("");
+		vp.getPanelPareja().getGenero1().setText("");
+		vp.getPanelPareja().getGenero2().setText("");
+		vp.getPanelPareja().getFotoPreview1().setIcon(null);
+		vp.getPanelPareja().getFotoPreview2().setIcon(null);
+	}
 
+	public void limpiarCamposAlEmparejar() {
+		vp.getPanelSoltero().getNombre().setText("");
+		vp.getPanelSoltero().getApellido().setText("");
+		vp.getPanelSoltero().getFechaNacimiento().setText("");
+		vp.getPanelSoltero().getProgAcademico().setText("");
+		vp.getPanelSoltero().getUniversidad().setText("");
+		vp.getPanelSoltero().getGenero().setText("");
+		vp.getPanelSoltero().getFotoPreview().setIcon(null);
+	}
+	
 	public void iniciarSesion() {
 		try {
 			long numeroDocumento;
 			try {
 				numeroDocumento = Long.parseLong(vis.getNumDocumento().getText());
 			} catch (NumberFormatException e) {
-				JOptionPane.showMessageDialog(null, "No se encuentra registrado ese documento");
+				JOptionPane.showMessageDialog(null,
+						propiedades.getProperty("appsoltero.joptionpane.documentonoregistrado"));
+				limpiarCampoInicioSesion();
 				return;
 			}
 
@@ -439,18 +485,24 @@ public class Controller implements ActionListener, ListSelectionListener {
 			solteroActual = sDAO.buscarPorDocumento(numeroDocumento);
 
 			if (solteroActual == null) {
-				JOptionPane.showMessageDialog(null, "No se encuentra registrado ese documento");
+				JOptionPane.showMessageDialog(null,
+						propiedades.getProperty("appsoltero.joptionpane.documentonoregistrado"));
+				limpiarCampoInicioSesion();
 				return;
 			}
 
-			JOptionPane.showMessageDialog(null, "Bienvenido, " + solteroActual.getNombre() + " a rutila");
+			JOptionPane.showMessageDialog(null,
+					propiedades.getProperty("appsoltero.joptionpane.messagedialog.iniciosesioncorrecto.uno")
+							+ solteroActual.getNombre() + (" ") 
+							+ propiedades.getProperty("appsoltero.joptionpane.messagedialog.iniciosesioncorrecto.dos"));
 			// aquí abres la ventana principal
 			limpiarCampoInicioSesion();
 			vis.setVisible(false);
 			vp.setVisible(true);
 
 		} catch (IdException e) {
-			JOptionPane.showMessageDialog(null, "No se encuentra registrado ese documento");
+			JOptionPane.showMessageDialog(null,
+					propiedades.getProperty("appsoltero.joptionpane.documentonoregistrado"));
 		}
 	}
 
@@ -523,10 +575,65 @@ public class Controller implements ActionListener, ListSelectionListener {
 		}
 	}
 
+	public void mostrarTodasLasParejas() {
+		DefaultTableModel modelo = (DefaultTableModel) vp.getPanelPareja().getTablaPareja().getModel();
+		modelo.setRowCount(0);
+
+		ArrayList<Pareja> lista = pDAO.getListaParejas();
+
+		for (Pareja pareja : lista) {
+			modelo.addRow(new Object[] { pareja.getNombre() + " & " + pareja.getNombrePareja() });
+		}
+	}
+
+	public void mostrarDetallesParejaSeleccionada() {
+		int fila = vp.getPanelPareja().getTablaPareja().getSelectedRow();
+		if (fila == -1) {
+			return;
+		}
+
+		DefaultTableModel modelo = (DefaultTableModel) vp.getPanelPareja().getTablaPareja().getModel();
+
+		String celda = modelo.getValueAt(fila, 0).toString();
+		String nombreSeleccionado = celda.split(" & ")[0];
+
+		ArrayList<Pareja> lista = pDAO.getListaParejas();
+
+		for (Pareja parejaSeleccionada : lista) {
+			if (parejaSeleccionada.getNombre().equals(nombreSeleccionado)) {
+
+				vp.getPanelPareja().getNombre1().setText(parejaSeleccionada.getNombre());
+				vp.getPanelPareja().getApellido1().setText(parejaSeleccionada.getApellido());
+				vp.getPanelPareja().getUniversidad1().setText(parejaSeleccionada.getUniversidad());
+				vp.getPanelPareja().getGenero1().setText(parejaSeleccionada.getGenero());
+				vp.getPanelPareja().getProgAcademico1().setText(parejaSeleccionada.getProgAcademico());
+				int edad1 = calcularEdad(parejaSeleccionada.getFechaNacimiento());
+				vp.getPanelPareja().getFechaNacimiento1().setText(edad1 + " años");
+				ImageIcon imagen1 = new ImageIcon(parejaSeleccionada.getRutaFotoPerfil());
+				ImageIcon escalada1 = new ImageIcon(imagen1.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH));
+				vp.getPanelPareja().getFotoPreview1().setIcon(escalada1);
+
+				vp.getPanelPareja().getNombre2().setText(parejaSeleccionada.getNombrePareja());
+				vp.getPanelPareja().getApellido2().setText(parejaSeleccionada.getApellidoPareja());
+				vp.getPanelPareja().getUniversidad2().setText(parejaSeleccionada.getUniversidadPareja());
+				vp.getPanelPareja().getGenero2().setText(parejaSeleccionada.getGeneroPareja());
+				vp.getPanelPareja().getProgAcademico2().setText(parejaSeleccionada.getProgAcademicoPareja());
+				int edad2 = calcularEdad(parejaSeleccionada.getFechaNacimientoPareja());
+				vp.getPanelPareja().getFechaNacimiento2().setText(edad2 + " años");
+				ImageIcon imagen2 = new ImageIcon(parejaSeleccionada.getRutafotoPerfilPareja());
+				ImageIcon escalada2 = new ImageIcon(imagen2.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH));
+				vp.getPanelPareja().getFotoPreview2().setIcon(escalada2);
+
+				break;
+			}
+		}
+	}
+
 	public void emparejarConSoltero() {
 		int fila = vp.getPanelSoltero().getTablaSoltero().getSelectedRow();
 		if (fila == -1) {
-			JOptionPane.showMessageDialog(null, "Selecciona un soltero para realizar esta acción");
+			JOptionPane.showMessageDialog(null,
+					propiedades.getProperty("appsoltero.joptio" + "npane.messagedialog.emparejar.nocorrecto"));
 			return;
 		}
 
@@ -544,19 +651,90 @@ public class Controller implements ActionListener, ListSelectionListener {
 		}
 
 		if (solteroSeleccionado == null) {
-			JOptionPane.showMessageDialog(null, "No se encontró el soltero");
+			JOptionPane.showMessageDialog(null,
+					propiedades.getProperty("appsoltero.joptionpane.messagedialog.emparejar.noseencuentrasoltero"));
 			return;
 		}
 
 		if (solteroSeleccionado.getNumeroDocumento() == solteroActual.getNumeroDocumento()) {
-			JOptionPane.showMessageDialog(null, "No puedes emparejarte contigo mismo");
+			JOptionPane.showMessageDialog(null,
+					propiedades.getProperty("appsoltero.joptionpane.messagedialog.emparejar.seleccionincorrecta"));
 			return;
 		}
 		// falta para juntar la pareja y eliminar los solteros
-		JOptionPane.showMessageDialog(null, "¡Pareja formada con éxito!");
+		pDAO.crear(new Pareja(solteroActual.getNombre(), solteroActual.getApellido(),
+				solteroActual.getFechaNacimiento(), solteroActual.getGenero(),
+				(long) solteroActual.getNumeroDocumento(), solteroActual.getUniversidad(),
+				solteroActual.getProgAcademico(), solteroActual.getRutaFotoPerfil(), solteroSeleccionado.getApellido(),
+				solteroSeleccionado.getNombre(), solteroSeleccionado.getGenero(),
+				solteroSeleccionado.getFechaNacimiento(), solteroSeleccionado.getUniversidad(),
+				(long) solteroSeleccionado.getNumeroDocumento(), solteroSeleccionado.getRutaFotoPerfil(),
+				solteroSeleccionado.getProgAcademico()));
+
+		ArrayList<Soltero> lista = sDAO.getListaSolteros();
+		for (int i = lista.size() - 1; i >= 0; i--) {
+			long doc = (long) lista.get(i).getNumeroDocumento();
+			if (doc == (long) solteroActual.getNumeroDocumento()
+					|| doc == (long) solteroSeleccionado.getNumeroDocumento()) {
+				sDAO.eliminar(i);
+			}
+		}
+		limpiarCamposAlEmparejar();
+		JOptionPane.showMessageDialog(null,
+				propiedades.getProperty("appsoltero.joptionpane.messagedialog.emparejar.seleccioncorrecta"));
 
 		mostrarTodosLosSolteros();
 
+	}
+
+	public void romperPareja() {
+		int fila = vp.getPanelPareja().getTablaPareja().getSelectedRow();
+		if (fila == -1) {
+			JOptionPane.showMessageDialog(null, "Selecciona una pareja primero");
+			return;
+		}
+
+		DefaultTableModel modelo = (DefaultTableModel) vp.getPanelPareja().getTablaPareja().getModel();
+		String celda = modelo.getValueAt(fila, 0).toString();
+		String nombreSeleccionado = celda.split(" & ")[0];
+
+		Pareja parejaEncontrada = null;
+		ArrayList<Pareja> lista = pDAO.getListaParejas();
+
+		for (Pareja pareja : lista) {
+			if (pareja.getNombre().equals(nombreSeleccionado)) {
+				parejaEncontrada = pareja;
+				break;
+			}
+		}
+
+		if (parejaEncontrada == null) {
+			JOptionPane.showMessageDialog(null, "No se encontró la pareja");
+			return;
+		}
+
+		sDAO.crear(new Soltero(parejaEncontrada.getNombre(), parejaEncontrada.getApellido(),
+				parejaEncontrada.getFechaNacimiento(), parejaEncontrada.getGenero(),
+				(long) parejaEncontrada.getNumeroDocumento(), parejaEncontrada.getUniversidad(),
+				parejaEncontrada.getProgAcademico(), parejaEncontrada.getRutaFotoPerfil()));
+
+		sDAO.crear(new Soltero(parejaEncontrada.getNombrePareja(), parejaEncontrada.getApellidoPareja(),
+				parejaEncontrada.getFechaNacimientoPareja(), parejaEncontrada.getGeneroPareja(),
+				parejaEncontrada.getNumeroDocumentoPareja(), parejaEncontrada.getUniversidadPareja(),
+				parejaEncontrada.getProgAcademicoPareja(), parejaEncontrada.getRutafotoPerfilPareja()));
+
+		ArrayList<Pareja> listaParejas = pDAO.getListaParejas();
+		for (int i = listaParejas.size() - 1; i >= 0; i--) {
+			if (listaParejas.get(i).getNombre().equals(nombreSeleccionado)) {
+				pDAO.eliminar(i);
+				break;
+			}
+		}
+
+		limpiarCamposAlBorrarPareja();
+		JOptionPane.showMessageDialog(null, "Pareja separada, ambos son solteros nuevamente");
+		mostrarTodasLasParejas();
+		mostrarTodosLosSolteros();
 	}
 
 	// === VERIFICAR CAMPOS (EXCEPCIONES) ===
@@ -647,10 +825,30 @@ public class Controller implements ActionListener, ListSelectionListener {
 		if (e.getValueIsAdjusting())
 			return;
 		mostrarDetallesSolteroSeleccionado();
+		mostrarDetallesParejaSeleccionada();
+	}
+
+	public void aplicarFuenteRecursivamente(java.awt.Container container, java.awt.Font fuente) {
+		for (java.awt.Component c : container.getComponents()) {
+			java.awt.Font fuenteActual = c.getFont();
+			if (fuenteActual != null) {
+				c.setFont(fuente.deriveFont(fuenteActual.getStyle(), fuenteActual.getSize2D()));
+			}
+			if (c instanceof java.awt.Container) {
+				aplicarFuenteRecursivamente((java.awt.Container) c, fuente);
+			}
+		}
 	}
 
 	public void aplicarCambioIdioma() {
+		java.awt.Font fuenteUniversal = new java.awt.Font("Dialog", java.awt.Font.BOLD, 20);
+		aplicarFuenteRecursivamente(vi, fuenteUniversal);
+		aplicarFuenteRecursivamente(vrp, fuenteUniversal);
+		aplicarFuenteRecursivamente(vis, fuenteUniversal);
+		aplicarFuenteRecursivamente(vp, fuenteUniversal);
 		// ventana inicial
+//		vi.setTitle(propiedades.getProperty("panel.ventanaInicial.encabezado"));
+		vi.getTitulo().setText(propiedades.getProperty("panel.ventanaInicial.titulo").trim());
 		vi.getInfo().setText(propiedades.getProperty("panel.ventanaInicial.infoIdioma").trim());
 		vi.getIniciar().setText(propiedades.getProperty("panel.ventanaInicial.infoApp").trim());
 
@@ -669,7 +867,8 @@ public class Controller implements ActionListener, ListSelectionListener {
 		vrp.getGuardarPersona().setText(propiedades.getProperty("panel.ventanaregistroPersona.guardar").trim());
 		vrp.getVolver().setText(propiedades.getProperty("panel.ventanaregistroPersona.boton.volver").trim());
 		vrp.getlIniSesion().setText(propiedades.getProperty("panel.ventanaregistroPersona.label.cuentacreada").trim());
-		vrp.getIniciarSesion().setText(propiedades.getProperty("panel.ventanaregistroPersona.boton.iniciarsesion").trim());
+		vrp.getIniciarSesion()
+				.setText(propiedades.getProperty("panel.ventanaregistroPersona.boton.iniciarsesion").trim());
 
 		vrp.getGenero().removeActionListener(this);
 		vrp.getGenero().removeAllItems();
@@ -696,8 +895,8 @@ public class Controller implements ActionListener, ListSelectionListener {
 		vrp.getChangeLanguage()
 				.addItem(propiedades.getProperty("panel.ventanaregistroPersona.listaIdiomas.japones").trim());
 		vrp.getChangeLanguage().addActionListener(this);
-		
-		//ventana iniciar sesion
+
+		// ventana iniciar sesion
 		vis.getInfo().setText(propiedades.getProperty("panel.ventanainiciarsesion.label.informacion").trim());
 		vis.getLabelDoc().setText(propiedades.getProperty("panel.ventanainiciarsesion.label.numerodocumento").trim());
 		vis.getVolver().setText(propiedades.getProperty("panel.ventanainiciarsesion.boton.volver").trim());
